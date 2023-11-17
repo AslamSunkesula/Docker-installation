@@ -1,28 +1,35 @@
 #!/bin/bash
 
-USERID=$(id -u)
 
 LOGSDIR=/tmp
 # /home/centos/shellscript-logs/script-name-date.log
-SCRIPT_NAME=$0
+SCRIPT_NAME=$(basename "$0")
 LOGFILE=$LOGSDIR/$SCRIPT_NAME-$DATE.log
 
-r="\e[31m"
-g="\e[32m"
+#!/bin/bash
+R="\e[31m"
+G="\e[32m"
+N="\e[0m"
+Y="\e[33m"
+
+USERID=$(id -u)
+
+echo -e "$Y This script runs on CentOS 8 $N"
+
 
 VALIDATE() {
     if [ $1 -ne 0 ]; then
-        echo -e "$2....$r FAILURE"
+        echo -e "$2....$R FAILURE"
         exit 1
     else
 
-        echo -e "$2....$g SUCCESS "
+        echo -e "$2....$G SUCCESS "
     fi
 }
 
 if [ $USERID -ne 0 ]; then
 
-    echo " $r Error : Please run this script with root access"
+    echo " $R Error : Please run this script with root access$N"
 
     exit 1
 
@@ -30,29 +37,24 @@ fi
 
 sudo yum install -y yum-utils
 
-VALIDATE $? "updating the packages" >>$LOGFILE
-
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-VALIDATE $? "add repo">>$LOGFILE
-
+VALIDATE $? "updating the packages" 
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo &&>>$LOGFILE
+VALIDATE $? "add repo" 
 #Install Docker Engine, containerd, and Docker Compose:
 
-sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-VALIDATE $? "install docker">>$LOGFILE
-
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin &&>>$LOGFILE
+VALIDATE $? "install docker"
 #Start Docker.
 
-sudo systemctl start docker
-VALIDATE $? "start docker">>$LOGFILE
+sudo systemctl start docker &&>>$LOGFILE
+VALIDATE $? "start docker"
 
 
-
-sudo systemctl enable docker
-VALIDATE $? "enable docker">>$LOGFILE
-
+sudo systemctl enable docker &&>>$LOGFILE
+VALIDATE $? "enable docker"
 # adding the centos as user in docker group
 
-sudo usermod -aG docker centos
-VALIDATE $? "adding the user to the docker group">>$LOGFILE
+sudo usermod -aG docker centos &>>$LOGFILE
+VALIDATE $? "adding the user to the docker group"
 
-exit
+echo -e "$R Please logout and login again $N"
