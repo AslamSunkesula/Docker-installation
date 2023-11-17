@@ -38,20 +38,21 @@ fi
 sudo yum install -y yum-utils
 
 VALIDATE $? "updating the packages" 
+
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo &&>>$LOGFILE
 VALIDATE $? "add repo" 
 #Install Docker Engine, containerd, and Docker Compose:
 
 sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin &&>>$LOGFILE
-VALIDATE $? "install docker"
+VALIDATE $? "Docker components are installed"
 #Start Docker.
 
 sudo systemctl start docker &&>>$LOGFILE
-VALIDATE $? "start docker"
+VALIDATE $? "docker started"
 
 
 sudo systemctl enable docker &&>>$LOGFILE
-VALIDATE $? "enable docker"
+VALIDATE $? "docker enabled"
 # adding the centos as user in docker group
 
 sudo usermod -aG docker centos &>>$LOGFILE
